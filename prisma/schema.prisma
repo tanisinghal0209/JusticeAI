@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id @default(uuid())
+  clerkId        String    @unique
+  name           String
+  email          String    @unique
+  language       String    @default("English")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  cases          Case[]
+  documents      Document[]
+}
+
+model Case {
+  id          String    @id @default(uuid())
+  title       String
+  description String?
+  status      String    @default("ACTIVE") // ACTIVE, CLOSED, DRAFT
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Document {
+  id          String    @id @default(uuid())
+  title       String
+  fileUrl     String
+  type        String    @default("OTHER") // COMPLAINT, CONTRACT, EVIDENCE
+  createdAt   DateTime  @default(now())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
